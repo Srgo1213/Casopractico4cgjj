@@ -1,0 +1,48 @@
+<?php
+require_once "lib/nusoap.php";
+function getEstados($datos){
+    if($datos =="Estados"){
+        return join(",", array(
+        "Chiapas",
+        "Tabasco",
+        "Veracruz",
+        "Oaxaca"));
+     }
+     else{
+        return"No hay estados";
+     }
+}
+$server = new soap_server();
+$server->register("getEstados");
+if (!isset($HTTP_RAW_POST_DATA) ) $HTTP_RAW_POST_DATA =file_get_contents('php://input');
+    $server->service ($HTTP_RAW_POST_DATA);
+?>
+
+
+<?php
+require_once "lib/nusoap.php";
+$cliente = new nusoap_cliente("http://localhost/practica4cgjj/server.php");
+
+$error = $cliente->getError();
+if($error){
+    echo"<h2>Contructor error</h2><pre>". $error. "</pre>";
+
+}
+$result = $cliente->call("getEstados", array("datos" => "Estados"));
+if($cliente->$Fault) {
+    echo"<h2>Fault</h2><pre>";
+    print_r($result);
+    echo"</pre>";
+}
+else{
+    $error =$cliente->geterror();
+    if($error){
+        echo "<h2>Error</h2><pre>" . $error . "</pre>";
+    }
+    else{
+        echo"<h2>Estados</h2><pre>";
+        echo $result;
+        echo"</pre>";
+    }
+}
+?>
